@@ -14,6 +14,9 @@ urlpatterns = [
     path('api/', include('attendance.urls')),
     path('api/', include('lectures.urls')),
     path('api/admin/', include('programmes.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('manage/', include('manage.urls')),  # <-- ADD THIS LINE
+    path('', include('accounts.urls')),
     path('', custom_login, name='home'),
     path('student/', TemplateView.as_view(template_name='student_dashboard.html')),
     path('lecturer/', TemplateView.as_view(template_name='lecturer_dashboard.html')),

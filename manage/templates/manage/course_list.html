@@ -1,0 +1,17 @@
+{% extends 'admin_dashboard.html' %}
+{% block content %}
+<div class="card p-4 card-stat">
+  <div class="d-flex justify-content-between mb-3">
+    <h4>Courses / Programmes</h4>
+    <a href="/manage/courses/add/" class="btn btn-primary">+ Add Course</a>
+  </div>
+  <table class="table">
+    <tr><th>Code</th><th>Name</th></tr>
+    {% for c in courses %}
+    <tr><td>{{ c.code }}</td><td>{{ c.name }}</td></tr>
+    {% empty %}<tr><td colspan="2">No courses yet. Click Add Course.</td></tr>
+    {% endfor %}
+  </table>
+  <a href="/dashboard/" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>
+{% endblock %}
