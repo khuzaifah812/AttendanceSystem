@@ -12,4 +12,4 @@ RUN adduser --disabled-password --no-create-home appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 EXPOSE 8000
-CMD gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+CMD sh -c "python manage.py migrate && python manage.py seed_data || true && gunicorn attendance_system.wsgi:application --bind 0.0.0.0:10000"
