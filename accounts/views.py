@@ -80,3 +80,33 @@ def admin_dashboard(request):
         'recent_students': Student.objects.order_by('-id')[:5],
     }
     return render(request, 'admin_dashboard.html', context)
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+
+def custom_login(request):
+    # If already logged in, go straight to dashboard
+    if request.user.is_authenticated:
+        if request.user.is_superuser or getattr(request.user, 'role', '') == 'ADMIN':
+            return redirect('/dashboard/')
+        elif getattr(request.user, 'role', '') == 'LECTURER':
+            return redirect('/lecturer/')
+        else:
+            return redirect('/student/')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            if user.is_superuser or getattr(user, 'role', '') == 'ADMIN':
+                return redirect('/dashboard/')
+            elif getattr(user, 'role', '') == 'LECTURER':
+                return redirect('/lecturer/')
+            else:
+                return redirect('/student/')
+        else:
+            return render(request, 'login.html', {'error': 'Invalid credentials'})
+    
+    return render(request, 'login.html')
