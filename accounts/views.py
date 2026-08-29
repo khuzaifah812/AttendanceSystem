@@ -35,3 +35,48 @@ class ProfileAPI(APIView):
             return Response({"staff_number":l.staff_number,"full_name":l.full_name})
         else:
             return Response({"username":u.username,"role":u.role})
+        
+        from django.contrib.auth.decorators import login_required
+from django.db.models import Count
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Student, Lecturer
+
+# Safe imports - will not crash even if model name different
+try:
+    from attendance.models import AttendanceRecord
+except:
+    AttendanceRecord = None
+
+try:
+    from lectures.models import Lecture
+except:
+    Lecture = None
+
+try:
+    from courses.models import Course
+except:
+    Course = None
+
+try:
+    from programmes.models import Programme
+except:
+    Programme = None
+
+@login_required
+def admin_dashboard(request):
+    if not (hasattr(request.user, 'role') and request.user.role == 'ADMIN' or request.user.is_superuser):
+        return redirect('/admin/login/')
+
+    context = {
+        'total_students': Student.objects.count(),
+        'total_lecturers': Lecturer.objects.count(),
+        'total_courses': Course.objects.count() if Course else 0,
+        'total_lectures': Lecture.objects.count() if Lecture else 0,
+        'total_programmes': Programme.objects.count() if Programme else 0,
+        'recent_attendance': AttendanceRecord.objects.order_by('-id')[:10] if AttendanceRecord else [],
+        'recent_students': Student.objects.order_by('-id')[:5],
+    }
+    return render(request, 'admin_dashboard.html', context)

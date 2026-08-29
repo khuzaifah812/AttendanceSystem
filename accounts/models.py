@@ -8,7 +8,7 @@ class User(AbstractUser):
     def is_student(self): return self.role=='STUDENT'
 
 class Student(models.Model):
-    user=models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
+    user=models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     registration_number=models.CharField(max_length=50, unique=True)
     first_name=models.CharField(max_length=100)
     last_name=models.CharField(max_length=100)
@@ -24,7 +24,7 @@ class Student(models.Model):
     def __str__(self): return self.registration_number
 
 class Lecturer(models.Model):
-    user=models.OneToOneField(User, on_delete=models.CASCADE, related_name='lecturer_profile')
+    user=models.OneToOneField(User, on_delete=models.CASCADE, null=True,blank=True)
     staff_number=models.CharField(max_length=50, unique=True)
     first_name=models.CharField(max_length=100)
     last_name=models.CharField(max_length=100)
