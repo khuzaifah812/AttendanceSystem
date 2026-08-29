@@ -53,12 +53,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME','attendance_db'),
-        'USER': os.getenv('DB_USER','attendance_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD','attendance_pass123'),
-        'HOST': os.getenv('DB_HOST','db'),
-        'PORT': os.getenv('DB_PORT','3306'),
-        'OPTIONS': {'charset':'utf8mb4'},
+        'NAME': os.getenv('DB_NAME', 'attendance_db'),
+        'USER': os.getenv('DB_USER', 'attendance_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'attendance_pass'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', '3306'),
+        'OPTIONS': {
+            'ssl': {'ssl-mode': 'REQUIRED'},
+        } if os.getenv('DB_HOST') and 'aivencloud' in os.getenv('DB_HOST', '') else {},
     }
 }
 
