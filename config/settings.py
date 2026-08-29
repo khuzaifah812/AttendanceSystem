@@ -28,6 +28,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,15 +56,15 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME', 'attendance_db'),
         'USER': os.getenv('DB_USER', 'attendance_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'attendance_pass'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'attendance_pass123'),
         'HOST': os.getenv('DB_HOST', 'db'),
         'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
-            'ssl': {'ssl-mode': 'REQUIRED'},
-        } if os.getenv('DB_HOST') and 'aivencloud' in os.getenv('DB_HOST', '') else {},
+            'charset': 'utf8mb4',
+            'ssl': {'ca': '/etc/ssl/certs/ca-certificates.crt'},
+        } if os.getenv('DB_HOST') and 'aivencloud.com' in os.getenv('DB_HOST', '') else {'charset': 'utf8mb4'},
     }
 }
-
 AUTH_USER_MODEL = 'accounts.User'
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -72,6 +73,8 @@ TIME_ZONE='Africa/Kampala'
 USE_TZ=True
 STATIC_URL='/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD='django.db.models.BigAutoField'
 
