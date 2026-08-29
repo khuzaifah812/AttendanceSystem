@@ -1,0 +1,23 @@
+{% extends 'base.html' %}{% block content %}
+<div class="card"><h2>Lecturer Dashboard - Today <span id="date"></span></h2><div id="lectures" class="grid"></div></div>
+<div class="card"><h3>Live Attendance</h3><table border="1" width="100%" id="table"><tr><th>#</th><th>Reg No</th><th>Name</th><th>Time</th></tr></table></div>
+<script>
+document.getElementById('date').innerText=new Date().toDateString();
+async function loadLectures(){
+ let r=await fetch('/api/lecturer/lectures/'); let j=await r.json();
+ document.getElementById('lectures').innerHTML=j.map(l=>`
+  <div class="card"><b>${l.course}</b><br>${l.start_time}-${l.end_time} Room ${l.room}<br>Status: ${l.status}<br>Expected ${l.expected} Present ${l.present} Absent ${l.absent}<br>
+  <button class="btn btn-success" onclick="startAtt(${l.id})">START ATTENDANCE</button>
+  <button class="btn btn-danger" onclick="endAtt(${l.id})">END ATTENDANCE</button>
+  <button class="btn" onclick="viewAtt(${l.id})">VIEW ATTENDANCE</button>
+  </div>`).join('');
+}
+async function startAtt(id){await fetch(`/api/lecturer/lectures/${id}/start-attendance/`,{method:'POST',headers:{'X-CSRFToken':getCSRF()}}); loadLectures()}
+async function endAtt(id){await fetch(`/api/lecturer/lectures/${id}/end-attendance/`,{method:'POST',headers:{'X-CSRFToken':getCSRF()}}); loadLectures()}
+let currentId=null;
+async function viewAtt(id){currentId=id; loadTable()}
+async function loadTable(){if(!currentId) return; let r=await fetch(`/api/lecturer/lectures/${currentId}/attendance/`); let j=await r.json(); document.getElementById('table').innerHTML='<tr><th>#</th><th>Reg No</th><th>Name</th><th>Time</th></tr>'+j.map((x,i)=>`<tr><td>${i+1}</td><td>${x.registration_number}</td><td>${x.full_name}</td><td>${x.check_in_time}</td></tr>`).join('')}
+setInterval(loadTable,5000);
+function getCSRF(){return document.cookie.split('; ').find(r=>r.startsWith('csrftoken='))?.split('=')[1]||''}
+loadLectures();
+</script>{% endblock %}

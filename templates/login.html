@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+    <body>
+        <div class="card" style="max-width:400px;margin:60px auto">
+            <h2>Login</h2>
+            <input id="username" placeholder="Registration No e.g UICT/2026/DSWE/0001">
+            <input id="password" type="password" placeholder="Full Name e.g Student 1 Name">
+            <button class="btn btn-primary" onclick="login()">LOGIN</button>
+<p id="msg"></p>
+
+</div>
+<script>
+function getCSRF(){let m=document.cookie.match(/csrftoken=([^;]+)/); return m?m[1]:''}
+async function login(){
+ let u=document.getElementById('username').value, p=document.getElementById('password').value;
+ let r=await fetch('/api/auth/login/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCSRF()},body:JSON.stringify({username:u,password:p})});
+ let j=await r.json();
+ if(j.error){document.getElementById('msg').innerText=j.error; return}
+ if(j.role=='STUDENT') location.href='/student/'; else if(j.role=='LECTURER') location.href='/lecturer/'; else location.href='/admin/';
+}
+</script></body></html>

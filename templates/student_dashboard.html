@@ -1,0 +1,24 @@
+{% extends 'base.html' %}{% block content %}
+<div class="card"><h3 id="pname"></h3><div id="active"></div>
+<button id="checkin" class="btn btn-primary" style="display:none;margin-top:16px">CHECK IN</button>
+<p id="msg"></p></div>
+<div class="card"><h4>History</h4><div id="hist"></div></div>
+<script>
+async function loadProfile(){let r=await fetch('/api/auth/profile/'); let j=await r.json(); document.getElementById('pname').innerText=(j.full_name||'')+' '+ (j.registration_number||'')}
+async function loadActive(){
+ let r=await fetch('/api/attendance/active/'); let j=await r.json();
+ if(j.lecture && !j.lecture.already_checked){document.getElementById('active').innerHTML=`<b>${j.lecture.course_name}</b><br>${j.lecture.room} ${j.lecture.start_time}-${j.lecture.end_time}<br><span style="color:green">ACTIVE</span>`; document.getElementById('checkin').style.display='block'; window.lectureId=j.lecture.id}
+ else if(j.lecture && j.lecture.already_checked){document.getElementById('active').innerHTML='You have already checked in for this lecture.'}
+ else{document.getElementById('active').innerText=j.message||'No attendance session is currently active.'}
+}
+document.getElementById('checkin').onclick=()=>{
+ document.getElementById('msg').innerText='Getting location...';
+ navigator.geolocation.getCurrentPosition(async pos=>{
+   let rr=await fetch('/api/attendance/check-in/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':document.cookie.split('; ').find(r=>r.startsWith('csrftoken='))?.split('=')[1]||''},body:JSON.stringify({latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy:pos.coords.accuracy})});
+   let jj=await rr.json(); document.getElementById('msg').innerText=jj.message||jj.error;
+   loadActive(); loadHist();
+ }, err=>{document.getElementById('msg').innerText='Location permission is required to take attendance.'},{enableHighAccuracy:true,timeout:10000});
+};
+async function loadHist(){let r=await fetch('/api/student/attendance-history/'); let j=await r.json(); document.getElementById('hist').innerHTML=j.map(x=>`${x.course} - ${x.date} ${x.time} ${x.status}`).join('<br>')}
+loadProfile(); loadActive(); loadHist();
+</script>{% endblock %}
