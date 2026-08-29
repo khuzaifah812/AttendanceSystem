@@ -110,3 +110,10 @@ def custom_login(request):
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     
     return render(request, 'login.html')
+
+
+from django.contrib.auth import logout
+
+def custom_logout(request):
+    logout(request)
+    return redirect('/')
